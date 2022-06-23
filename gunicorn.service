@@ -1,5 +1,5 @@
 [Unit]
-Description= Demo fastapi application
+Description= demo fastapi application
 After=network.target
 
 [Service]
@@ -7,6 +7,7 @@ User=rakshith
 Group=rakshith
 WorkingDirectory=/home/rakshith/app/src
 Environment="PATH=/home/rakshith/app/venv/bin"
+EnvironmentFile=/home/rakshith/.env
 ExecStart=/home/rakshith/app/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8000
 
 [Install]
