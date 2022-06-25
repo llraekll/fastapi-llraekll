@@ -14,3 +14,8 @@ def test_create_user(client):
     new_user=schemas.UserOut(**res.json())
     assert new_user.email == "testone@yahoo.in"
     assert res.status_code == 201
+
+def test_login_user(client):
+    res = client.post(
+        "/login", data={"username": "testone@yahoo.in", "password": "random"})
+    assert res.status_code == 200
