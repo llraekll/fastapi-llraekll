@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from app.database import get_db, Base
 from app.oauth2 import create_access_token
 import pytest
+from app import models
 
 SQLALCHEMY_DATABASE_URL= f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test'
 
@@ -74,4 +75,34 @@ def authorized_client(client, token):
     }
     return client
 
+@pytest.fixture
+def test_posts(test_user, session):
+    posts_data = [{
+        "title": "first title",
+        "content": "1st random",
+        "owner_id": test_user['id']
+    },{
+        "title": "second title",
+        "content": "2nd random",
+        "owner_id": test_user['id']
+    },{
+        "title": "third title",
+        "content": "3rd random",
+        "owner_id": test_user['id']
+    }]
+
+    def create_post_model(post):
+        return models.Post(**post)
+    post_map = map(create_post_model, posts_data)
+    posts = list(post_map)
+
+    session.add_all(posts)
+
+    #session.add_all([models.Post(title="first title", content="1st random", owner_id=test_user['id']),
+                    #models.Post(title="second title", content="2nd random", owner_id=test_user['id']),
+                    #models.Post(title="third title", content="3rd random", owner_id=test_user['id'])])
+    session.commit()
+
+    posts = session.query(models.Post).all()
+    return posts
     
