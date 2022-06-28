@@ -19,3 +19,8 @@ def test_login_user(client):
     res = client.post(
         "/login", data={"username": "testone@yahoo.in", "password": "random"})
     assert res.status_code == 200
+
+def test_get_user(client):
+    res= client.post("/users/{id}")
+    get_user=schemas.UserOut(**res.json())
+    assert res.status_code == 200
