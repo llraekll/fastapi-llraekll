@@ -9,6 +9,7 @@ from app.config import settings
 def test_root(client):
     res = client.get("/")
     print(res.json().get('message'))
+    assert 1==1
     assert res.json().get('message') == 'Hello human!'
     assert res.status_code == 200
 
