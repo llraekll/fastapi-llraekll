@@ -28,7 +28,7 @@ app.include_router(vote.router)
 @app.get("/")
 def root():
 
-    return {"message": "Hello human!Deploy now"}
+    return {"message": "Hello human! Deployed to ubuntu."}
 
 
 
