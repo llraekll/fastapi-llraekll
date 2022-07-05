@@ -10,18 +10,19 @@ from app.oauth2 import create_access_token
 import pytest
 from app import models
 
-SQLALCHEMY_DATABASE_URL= f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test'
+SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test'
 
-engine= create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 
-TestingSessionLocal= sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine)
 
-#Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 #Base= declarative_base()
 
-#def override_get_db():
+# def override_get_db():
 #    db = TestingSessionLocal()
 #    try:
 #        yield db
@@ -29,6 +30,7 @@ TestingSessionLocal= sessionmaker(autocommit=False, autoflush=False, bind=engine
 #        db.close()
 
 #app.dependency_overrides[get_db] = override_get_db
+
 
 @pytest.fixture()
 def session():
@@ -46,29 +48,32 @@ def session():
 def client(session):
     def override_get_db():
         try:
-             yield session
+            yield session
         finally:
             session.close()
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
 
+
 @pytest.fixture()
 def test_user2(client):
-    user_data= {"email": "test2@yahoo.in", "password": "random"}
+    user_data = {"email": "test2@yahoo.in", "password": "random"}
     res = client.post('/users/', json=user_data)
     assert res.status_code == 201
-    new_user= res.json()
-    new_user['password']= user_data['password']
+    new_user = res.json()
+    new_user['password'] = user_data['password']
     return new_user
+
 
 @pytest.fixture()
 def test_user(client):
-    user_data= {"email": "testone@yahoo.in", "password": "random"}
+    user_data = {"email": "testone@yahoo.in", "password": "random"}
     res = client.post('/users/', json=user_data)
     assert res.status_code == 201
-    new_user= res.json()
-    new_user['password']= user_data['password']
+    new_user = res.json()
+    new_user['password'] = user_data['password']
     return new_user
+
 
 @pytest.fixture
 def token(test_user):
@@ -77,11 +82,12 @@ def token(test_user):
 
 @pytest.fixture
 def authorized_client(client, token):
-    client.headers ={
+    client.headers = {
         **client.headers,
         "Authorization": f"Bearer {token}"
     }
     return client
+
 
 @pytest.fixture
 def test_posts(test_user, session, test_user2):
@@ -89,15 +95,15 @@ def test_posts(test_user, session, test_user2):
         "title": "first title",
         "content": "1st random",
         "owner_id": test_user['id']
-    },{
+    }, {
         "title": "second title",
         "content": "2nd random",
         "owner_id": test_user['id']
-    },{
+    }, {
         "title": "third title",
         "content": "3rd random",
         "owner_id": test_user['id']
-    },{
+    }, {
         "title": "first title",
         "content": "1st random",
         "owner_id": test_user2['id']
@@ -110,11 +116,10 @@ def test_posts(test_user, session, test_user2):
 
     session.add_all(posts)
 
-    #session.add_all([models.Post(title="first title", content="1st random", owner_id=test_user['id']),
-                    #models.Post(title="second title", content="2nd random", owner_id=test_user['id']),
-                    #models.Post(title="third title", content="3rd random", owner_id=test_user['id'])])
+    # session.add_all([models.Post(title="first title", content="1st random", owner_id=test_user['id']),
+    #models.Post(title="second title", content="2nd random", owner_id=test_user['id']),
+    # models.Post(title="third title", content="3rd random", owner_id=test_user['id'])])
     session.commit()
 
     posts = session.query(models.Post).all()
     return posts
-    
